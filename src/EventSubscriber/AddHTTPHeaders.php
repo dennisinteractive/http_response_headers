@@ -7,6 +7,7 @@
 
 namespace Drupal\http_response_headers\EventSubscriber;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -43,13 +44,17 @@ class AddHTTPHeaders implements EventSubscriberInterface {
     $response = $event->getResponse();
 
     $headers = $this->config->get('headers');
-    var_dump($headers); exit;
     foreach ($headers as $key => $header) {
-      if (!empty($header['name']) && $header['value']) {
+      if (!empty($header['name'])) {
         // @TODO Add context rules to header groups to allow
         // certain groups to only be applied in certain contexts.
 
-        $response->headers->set($header['name'], $header['value']);
+        if (!empty($header['value'])) {
+          $response->headers->set($header['name'], $header['value']);
+        }
+        else {
+          $response->headers->remove($header['name']);
+        }
       }
     }
   }

@@ -14,3 +14,16 @@ This module allows the following HTTP header configurations:
 * Cache-Control
 
 Please install the module and configure it here `admin/config/development/http_response_headers`.
+
+Example config:
+```
+headers:
+  -
+    group: security
+    name:  Strict-Transport-Security
+    value: 'max-age=31536000; includeSubDomains'
+  -
+    group: security
+    name:  X-XSS-Protection
+    value: 'X-XSS-Protection: 1; mode=block'
+```

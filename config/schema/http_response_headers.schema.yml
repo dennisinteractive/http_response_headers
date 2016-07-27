@@ -10,12 +10,14 @@ http_response_headers.settings:
       sequence:
         type: mapping
         label: 'Header'
-        group:
-          type: string
-          label: 'Header group'
-        name:
-          type: string
-          label: 'Header type'
-        value:
-          type: string
-          label: 'Header value'
+        mapping:
+          group:
+            type: string
+            label: 'Header group'
+          name:
+            type: string
+            label: 'Header type'
+          value:
+            type: string
+            label: 'Header value'
+            nullable: TRUE

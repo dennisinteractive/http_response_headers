@@ -1,9 +1,0 @@
-headers:
-  -
-    group: security
-    name:  Strict-Transport-Security
-    value: 'max-age=31536000; includeSubDomains'
-  -
-    group: security
-    name:  X-XSS-Protection
-    value: 'X-XSS-Protection: 1; mode=block'
