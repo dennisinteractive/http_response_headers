@@ -17,6 +17,23 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class AddHTTPHeaders implements EventSubscriberInterface {
 
   /**
+   * The config object for the google_tag settings.
+   *
+   * @var \Drupal\Core\Config\ImmutableConfig
+   */
+  protected $config;
+
+  /**
+   * Constructs a new Google Tag response subscriber.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   *   The config factory service.
+   */
+  public function __construct(ConfigFactoryInterface $configFactory) {
+    $this->config = $configFactory->get('http_response_headers.settings');
+  }
+
+  /**
    * Sets extra HTTP headers.
    */
   public function onRespond(FilterResponseEvent $event) {
@@ -24,28 +41,17 @@ class AddHTTPHeaders implements EventSubscriberInterface {
       return;
     }
     $response = $event->getResponse();
-    $config = \Drupal::config('http_response_headers.settings');
 
-    // Security HTTP headers.
-    $security = $config->get('security');
-    foreach ($security as $param => $value) {
-      if (!empty($value)) {
-        $response->headers->set($param, $value);
+    $headers = $this->config->get('headers');
+    var_dump($headers); exit;
+    foreach ($headers as $key => $header) {
+      if (!empty($header['name']) && $header['value']) {
+        // @TODO Add context rules to header groups to allow
+        // certain groups to only be applied in certain contexts.
+
+        $response->headers->set($header['name'], $header['value']);
       }
     }
-
-    $authenticated_only = $config->get('performance_authenticated_only');
-    $current_user = \Drupal::currentUser();
-    // Performance HTTP headers.
-    if ($authenticated_only && !$current_user->isAnonymous()) {
-      $performance = $config->get('performance');
-      foreach ($performance as $param => $value) {
-        if (!empty($value)) {
-          $response->headers->set($param, $value);
-        }
-      }
-    }
-
   }
 
   /**

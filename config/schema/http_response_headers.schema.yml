@@ -1,0 +1,21 @@
+# Schema for the configuration files of the HTTP Response Headers module.
+http_response_headers.settings:
+  type: config_object
+  label: 'HTTP Reponse Headers settings'
+  mapping:
+    headers:
+      type: sequence
+      label: 'Headers'
+      nullable: TRUE
+      sequence:
+        type: mapping
+        label: 'Header'
+        group:
+          type: string
+          label: 'Header group'
+        name:
+          type: string
+          label: 'Header type'
+        value:
+          type: string
+          label: 'Header value'
