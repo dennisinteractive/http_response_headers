@@ -1,8 +1,6 @@
-This is a very simple Drupal 8 module that will help secure your website's HTTP headers and improve performance.
+This module allows headers to be added, updated or removed through configuration with a particular focus on security and performance headers.
 
-* Blog post [https://www.chapterthree.com/blog/how-to-secure-drupal-http-headers](https://www.chapterthree.com/blog/how-to-secure-drupal-http-headers)
-
-This module allows the following HTTP header configurations:
+By default the following HTTP header configurations are set:
 
 * Content-Security-Policy
 * Strict-Transport-Security
@@ -11,19 +9,5 @@ This module allows the following HTTP header configurations:
 * X-Xss-Protection
 * X-Frame-Options
 * X-Content-Type-Options
-* Cache-Control
 
-Please install the module and configure it here `admin/config/development/http_response_headers`.
-
-Example config:
-```
-headers:
-  -
-    group: security
-    name:  Strict-Transport-Security
-    value: 'max-age=31536000; includeSubDomains'
-  -
-    group: security
-    name:  X-XSS-Protection
-    value: 'X-XSS-Protection: 1; mode=block'
-```
+Please install the module and configure it here `/admin/config/system/response-headers`.
