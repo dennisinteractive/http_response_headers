@@ -18,11 +18,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class AddHTTPHeaders implements EventSubscriberInterface {
 
   /**
-   * The config object for the google_tag settings.
+   * The entity storage manager for response_header entities.
    *
-   * @var \Drupal\Core\Config\ImmutableConfig
+   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $config;
+  protected $entityManager;
 
   /**
    * Constructs a new Google Tag response subscriber.
@@ -31,7 +31,7 @@ class AddHTTPHeaders implements EventSubscriberInterface {
    *   The config factory service.
    */
   public function __construct(ConfigFactoryInterface $configFactory) {
-    $this->config = $configFactory->get('http_response_headers.settings');
+    $this->entityManager = \Drupal::entityTypeManager()->getStorage('response_header');
   }
 
   /**
@@ -43,17 +43,24 @@ class AddHTTPHeaders implements EventSubscriberInterface {
     }
     $response = $event->getResponse();
 
-    $headers = $this->config->get('headers');
-    foreach ($headers as $key => $header) {
-      if (!empty($header['name'])) {
-        // @TODO Add context rules to header groups to allow
-        // certain groups to only be applied in certain contexts.
-
-        if (!empty($header['value'])) {
-          $response->headers->set($header['name'], $header['value']);
-        }
-        else {
-          $response->headers->remove($header['name']);
+    $headers = $this->entityManager->loadMultiple();
+    if (!empty($headers)) {
+      foreach ($headers as $key => $header) {
+        if (!empty($header->get('name'))) {
+          // @TODO Add context rules to header groups to allow
+          // certain groups to only be applied in certain contexts.
+          if (!empty($header->get('value'))) {
+            // Must remove the existing header if settings a new value.
+            if ($response->headers->has($header->get('name'))) {
+              \Drupal::logger('http_response_headers')->notice('header removed the readded' . $header->get('name'));
+              $response->headers->remove($header->get('name'));
+            }
+            $response->headers->set($header->get('name'), $header->get('value'));
+          }
+          else {
+            \Drupal::logger('http_response_headers')->notice('header removed' . $header->get('name'));
+            $response->headers->remove($header->get('name'));
+          }
         }
       }
     }
@@ -63,7 +70,7 @@ class AddHTTPHeaders implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
-    $events[KernelEvents::RESPONSE][] = ['onRespond'];
+    $events[KernelEvents::RESPONSE][] = ['onRespond', -100];
     return $events;
   }
 
